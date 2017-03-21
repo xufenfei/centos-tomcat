@@ -25,11 +25,16 @@ RUN wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=acc
 
 # Install Tomcat
 ENV TOMCAT_MAJOR 8
-ENV TOMCAT_VERSION 8.5.9
+ENV TOMCAT_VERSION 8.5.12
 
 RUN wget http://ftp.riken.jp/net/apache/tomcat/tomcat-${TOMCAT_MAJOR}/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz && \
  tar -xvf apache-tomcat-${TOMCAT_VERSION}.tar.gz && \
  rm apache-tomcat*.tar.gz && \
+ cd apache-tomcat*/conf  && \
+ sed -i '108,134d' catalina.properties && \
+ echo "tomcat.util.scan.StandardJarScanFilter.jarsToSkip=*.jar" >> catalina.properties && \
+ sed -i 's!tomcat.util.scan.StandardJarScanFilter.jarsToScan!#tomcat.util.scan.StandardJarScanFilter.jarsToScan!g' catalina.properties && \
+ cd ../../ && \
  mv apache-tomcat* ${CATALINA_HOME}
 
 RUN chmod +x ${CATALINA_HOME}/bin/*sh
